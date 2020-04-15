@@ -1,19 +1,24 @@
-const { pool, router, Result } = require("../connect");
+const { pool, router, Result } = require("../../connect");
 
 router.get("/top", (req, res) => {
-  pool.getConnection((err, çonn) => {
+  pool.getConnection((err, conn) => {
     const sql = `select * from topMenu`;
-    çonn.query(sql, (e, r) => {
+    conn.query(sql, (e, r) => {
       res.json(new Result({ data: r, code: 1 }));
     });
   });
 });
 
 router.get("/left", (req, res) => {
-  pool.getConnection((err, çonn) => {
-    const sql = `select * from leftMenu`;
-    çonn.query(sql, (e, arr) => {
-      res.json(new Result({ data: TreeData(arr), code: 1 }));
+  pool.getConnection((err, conn) => {
+    const sql = `select * from leftMenu where topMenu='${req.query.topMenuId}'`;
+    conn.query(sql, (e, arr) => {
+      if (!e) {
+        res.json(new Result({ data: TreeData(arr || []), code: 1 }));
+      } else {
+        console.log("数据库连接错误:" + e.message);
+        res.json(new Result({ data: [], code: 0, msg: "操作失败" }));
+      }
     });
   });
 });
@@ -28,7 +33,7 @@ function TreeData(data) {
       children.push(item);
     }
   });
-  console.log(arr);
+
   arr.forEach((el) => {
     el.chidlren = [];
     children.forEach((item) => {
@@ -37,7 +42,6 @@ function TreeData(data) {
       }
     });
   });
-  console.log(arr);
   return arr;
 }
 

@@ -1,4 +1,4 @@
-const { pool, router, Result } = require("../connect");
+const { pool, router, Result } = require("../../connect");
 const jwt = require("jsonwebtoken");
 
 router.get("/login", (req, res) => {

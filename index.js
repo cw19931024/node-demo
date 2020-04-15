@@ -1,20 +1,24 @@
 const { pool, app, Result } = require("./connect");
-const user = require("./user/index");
-const menu = require("./menu/index");
+const user = require("./Api/user/index");
+const menu = require("./Api/menu");
+const property = require("./Api/property");
 const jwt = require("jsonwebtoken");
-
-app.listen(1203, () => {
-  console.log("服务启动");
+const port = 1124;
+app.listen(port, () => {
+  console.log("服务启动,端口号:"+port);
 });
 
 app.all("*", (req, res, next) => {
   let url = urlString(req.url);
   console.log(url);
-  if (true||url[0] == "user" && (url[1] == "login" || url[1] == "register")) {
+  if (
+    true ||
+    (url[0] == "user" && (url[1] == "login" || url[1] == "register"))
+  ) {
     next();
   } else {
     let token = req.get("Authorization");
-    console.log(token)
+    console.log(token);
     jwt.verify(token, "jwt", (err, decode) => {
       if (err) {
         res.json({ status: false, msg: "token以失效" });
@@ -34,6 +38,7 @@ app.all("/", (req, res) => {
 
 app.use("/user", user);
 app.use("/menu", menu);
+app.use("/property", property);
 /**
  * res.json("hello word!"); //以json返回给前端;
  * res.send('hello word!') //以页面返回;
